@@ -38,11 +38,13 @@ disc.datEx$Seconds = disc.dat1$Seconds/1000 # convert to seconds
 disc.dat1 <- read.delim("data/Discovery_time.txt", # fileloc
                         header = FALSE, # no header
                         col.names = "Seconds") # label the column
-disc.dat1$Network = factor(c("Network 1")) # Add a column called 'Network' with the network name
+
+disc.dat1$Network = factor("Network 1") # Add a column called 'Network' with the network name
+
 disc.dat1$Seconds = disc.dat1$Seconds/1000 # convert to seconds
 
 disc.dat2 <- data.frame("Seconds" = sample(10000:30000, 160, replace=T)) 
-disc.dat2$Network = factor(c("Network 2")) # Add a column called 'Network' with the network name
+disc.dat2$Network = factor("Network 2") # Add a column called 'Network' with the network name
 disc.dat2$Seconds = disc.dat2$Seconds/1000 # convert to seconds
 ```
 

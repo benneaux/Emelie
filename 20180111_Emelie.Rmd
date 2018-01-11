@@ -6,26 +6,51 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-
+library(knitr)
+library(tidyverse)
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r options, include=FALSE}
+opts_chunk$set(echo = TRUE)
 ```
 
-## Including Plots
+```{r data, echo = FALSE}
+disc.dat1 <- read.delim("data/Discovery_time.txt", # fileloc
+                        header = FALSE, # no header
+                        col.names = "Seconds") # label the column
+disc.dat1$Network = factor(c("Network 1")) # Add a column called 'Network' with the network name
+disc.dat1$Seconds = disc.dat1$Seconds/1000 # convert to seconds
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+disc.dat2 <- data.frame("Seconds" = sample(10000:30000, 160, replace=T)) 
+disc.dat2$Network = factor(c("Network 2")) # Add a column called 'Network' with the network name
+disc.dat2$Seconds = disc.dat2$Seconds/1000 # convert to seconds
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r combinedata, echo = FALSE}
+data = rbind(disc.dat1, disc.dat2) # add each dataset here.
+```
+
+```{r getmedian, echo = FALSE}
+med.data = data %>%
+  group_by(Network) %>%
+  summarise(Median = median(Seconds))
+head(med.data)
+```
+
+```{r plot}
+ggplot(data = data, aes(x = Network, y = Seconds, group = Network)) +
+  theme_linedraw() + 
+  geom_violin(position = "dodge", fill = "grey") + 
+  geom_boxplot(width= 0.05, 
+               outlier.colour = NA,
+               position = "dodge", 
+               fill = "black") +
+  
+  geom_point(data = med.data, aes(x = Network, y = Median),
+             colour = "white") + 
+  
+  labs(y = "Time (seconds)", x = "Network")
+  
+```
+
+

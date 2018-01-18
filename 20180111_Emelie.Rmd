@@ -89,6 +89,47 @@ messmed.data = messdata %>%            # Creates new object as a copy
   summarise(Median = median(Messages)) # Returns the median value for each.
 ```
 
+### Query Period Data
+
+And for the Query period data
+
+```{r quedata}
+que.dat1 <- read.delim("data/Query_Time/Discovery_time_Period_2000.txt", # fileloc
+                        header = FALSE, # no header
+                        col.names = "Seconds") # label the column
+
+que.dat1$Network = factor("B4") # Add a column called 'Network' with the network name
+que.dat1$Seconds = que.dat1$Seconds/1000 # Convert to milliseconds
+
+que.dat2 <- read.delim("data/Query_Time/Discovery_time_Period_1000.txt", # fileloc
+                        header = FALSE, # no header
+                        col.names = "Seconds") # label the column
+
+que.dat2$Network = factor("B4") # Add a column called 'Network' with the network name
+que.dat2$Seconds = que.dat2$Seconds/1000 # Convert to milliseconds
+
+que.dat3 <- read.delim("data/Query_Time/Discovery_time_Period_500.txt", # fileloc
+                        header = FALSE, # no header
+                        col.names = "Seconds") # label the column
+
+que.dat3$Network = factor("B4") # Add a column called 'Network' with the network name
+que.dat3$Seconds = que.dat3$Seconds/1000 # Convert to milliseconds
+
+que.dat4 <- read.delim("data/Query_Time/Discovery_time_Period_200.txt", # fileloc
+                        header = FALSE, # no header
+                        col.names = "Seconds") # label the column
+
+que.dat4$Network = factor("B4") # Add a column called 'Network' with the network name
+que.dat4$Seconds = que.dat4$Seconds/1000 # Convert to milliseconds
+```
+
+Next, combine all the data files together into a single data frame, taking the mean of every file first.
+
+```{r disccombinedata}
+quedata = rbind(mean(que.dat1$Seconds), # Binds the data together by row (hence 'r'bind).
+            mean(que.dat2$Seconds), mean(que.dat3$Seconds), mean(que.dat4$Seconds) ) # add each dataset here.
+```
+
 ## Plotting
 
 We'll use `ggplo2` to plot the data becuase it has an easy-to-use `geom_violin` function for violin plots. Firtsly, you need to create a ggplot object with data. Then you call the various plotting functions. Remember to plot the median dots last, because you'll need to repoint `data` at the `med.data` dataframe we created earlier.
@@ -189,4 +230,11 @@ p2 <-  ggplot(data = messdata,         # our combined data
 
 ```{r messplotplot, echo = FALSE}
 p2
+```
+
+Make a simple line plot for the query time plot
+
+```{r queplot, echo = FALSE}
+x <- c(2000, 1000, 500, 200)
+plot(x, quedata, type = "o")
 ```

@@ -41,13 +41,21 @@ disc.dat2$Network = factor("B4") # Add a column called 'Network' with the networ
 
 disc.dat2$Seconds = disc.dat2$Seconds/1000 # convert to seconds
 
+disc.dat3 <- read.delim("data/Discovery_time_Simple3.txt", # fileloc
+                        header = FALSE, # no header
+                        col.names = "Seconds") # label the column
+
+disc.dat3$Network = factor("Dim3") # Add a column called 'Network' with the network name
+
+disc.dat3$Seconds = disc.dat3$Seconds/1000 # convert to seconds
+
 ```
 
 Next, combine all the data files together into a single data frame.
 
 ```{r disccombinedata}
 discdata = rbind(disc.dat1, # Binds the data together by row (hence 'r'bind).
-             disc.dat2) # add each dataset here.
+             disc.dat2, disc.dat3) # add each dataset here.
 ```
 
 Lastly, we need to calculate the median of each Network to plot later. Note: the `%>%` is a pipe (from the `magrittr` or `dplyr` packages in `R`). The `group_by` and `summarise` functions come from the `dplyr` package.
@@ -69,16 +77,23 @@ mess.dat1 <- read.delim("data/MessagesSent_B4.txt", # fileloc
 
 mess.dat1$Network = factor("B4") # Add a column called 'Network' with the network name
 mess.dat1$Messages = mess.dat1$Messages/12 # divides B4 message numbers by 12.
+
+mess.dat2 <- read.delim("data/Messages_sent_Simple3.txt", # fileloc
+                        header = FALSE, # no header
+                        col.names = "Messages") # label the column
+
+mess.dat2$Network = factor("Dim3") # Add a column called 'Network' with the network name
+mess.dat2$Messages = mess.dat2$Messages/3 # divides B4 message numbers by 12.
 ```
 
 And we'll combine them in the same way.
 
 ```{r messcombinedata}
 # Comment out the below line and uncomment the last lines to add extra data).
-messdata = mess.dat1
+#messdata = mess.dat1
 
-#messdata = rbind(mess.dat1, # Binds the data together by row (hence 'r'bind).
-#                 mess.dat2) # add each dataset here.
+messdata = rbind(mess.dat1, # Binds the data together by row (hence 'r'bind).
+                 mess.dat2) # add each dataset here.
 ```
 
 And get the median.
@@ -272,13 +287,5 @@ And a double line plot for ping
 
 x_ping  <- seq(1, length(ping.dat1$Seconds), 1)
 
-df <- data.frame(x1=x1_ping, x2=x2_ping, y=pingdata)
-
-
-
-p3 <- ggplot(data=df, aes(x=x1, y=y1, group=1)) +
-  geom_line(color="red") +
-  geom_point()
-p3 <- p3 + geom_line(aes(y=y1), colour="red")
-p3 <- p3 + geom_line(aes(y=y2), colour="green")
-p3
+plot(x_ping, log(ping.dat1$Seconds), xlab="Sequence number of echo reply", ylab="Log(RTT)", type="l",col="red")
+lines(x_ping , log(ping.dat2$Seconds), col="green")

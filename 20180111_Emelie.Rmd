@@ -125,10 +125,39 @@ que.dat4$Seconds = que.dat4$Seconds/1000 # Convert to milliseconds
 
 Next, combine all the data files together into a single data frame, taking the mean of every file first.
 
-```{r disccombinedata}
+```{r quecombinedata}
 quedata = rbind(mean(que.dat1$Seconds), # Binds the data together by row (hence 'r'bind).
             mean(que.dat2$Seconds), mean(que.dat3$Seconds), mean(que.dat4$Seconds) ) # add each dataset here.
 ```
+
+### Ping data, lab 1
+
+And for the ping data
+
+```{r pingdata}
+ping.dat1 <- read.delim("data/Lab1/ping_data.txt", # fileloc
+                        header = FALSE, # no header
+                        col.names = "Seconds") # label the column
+
+ping.dat1$Network = factor("h1 ping h2") # Add a column called 'Network' with the network name
+ping.dat1$Seconds = ping.dat1$Seconds/1000 # Convert to milliseconds
+
+ping.dat2 <- read.delim("data/Lab1/ping_data2.txt", # fileloc
+                        header = FALSE, # no header
+                        col.names = "Seconds") # label the column
+
+ping.dat2$Network = factor("h2 ping h1") # Add a column called 'Network' with the network name
+ping.dat2$Seconds = ping.dat2$Seconds/1000 # Convert to milliseconds
+
+```
+
+Next, combine all the data files together into a single data frame.
+
+```{r pingcombinedata}
+pingdata = rbind(ping.dat1$Seconds, # Binds the data together by row (hence 'r'bind).
+            ping.dat2$Seconds) # add each dataset here.
+```
+
 
 ## Plotting
 
@@ -238,3 +267,18 @@ Make a simple line plot for the query time plot
 x <- c(2000, 1000, 500, 200)
 plot(x, quedata, type = "o")
 ```
+
+And a double line plot for ping
+
+x_ping  <- seq(1, length(ping.dat1$Seconds), 1)
+
+df <- data.frame(x1=x1_ping, x2=x2_ping, y=pingdata)
+
+
+
+p3 <- ggplot(data=df, aes(x=x1, y=y1, group=1)) +
+  geom_line(color="red") +
+  geom_point()
+p3 <- p3 + geom_line(aes(y=y1), colour="red")
+p3 <- p3 + geom_line(aes(y=y2), colour="green")
+p3

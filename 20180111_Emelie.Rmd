@@ -244,18 +244,19 @@ p2 <-  ggplot(data = messdata,         # our combined data
   
       # Call each plot
       geom_violin(position = "dodge",   # Ignore
-                  fill = "grey") +      # colour of violin
-      geom_boxplot(width= 0.1,          # Width of the boxplot
-                   outlier.colour = NA, # Outliers not plotted
-                   position = "dodge",  # Ignore
-                   fill = "black") +    # colour of box
+                  fill = "grey",
+                  draw_quantiles = c(0.25, 0.5, 0.75)) +  # colour of violin
+      # geom_boxplot(width= 0.1,          # Width of the boxplot
+      #              outlier.colour = NA, # Outliers not plotted
+      #              position = "dodge",  # Ignore
+      #              fill = "black") +    # colour of box
       
       # plot the Median points
-      geom_point(data = messmed.data,  # the median data
-                 aes(x = Network,  # Networks on the x axis (same as above).
-                     y = Median),  # the Median value on the y axis.
-                 colour = "white", # colour of the dot
-                 size = 4) +       # size of the dot
+      # geom_point(data = messmed.data,  # the median data
+      #            aes(x = Network,  # Networks on the x axis (same as above).
+      #                y = Median),  # the Median value on the y axis.
+      #            colour = "white", # colour of the dot
+      #            size = 4) +       # size of the dot
       
       # formatting options
       
@@ -280,7 +281,7 @@ Make a simple line plot for the query time plot
 
 ```{r queplot, echo = FALSE}
 x <- c(2000, 1000, 500, 200)
-plot(x, quedata, type = "o")
+plot(x, quedata, type = "o", xlim=rev(range(x)))
 ```
 
 And a double line plot for ping

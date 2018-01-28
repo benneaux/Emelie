@@ -64,6 +64,8 @@ Lastly, we need to calculate the median of each Network to plot later. Note: the
 discmed.data = discdata %>%           # Creates new object as a copy
   group_by(Network) %>%               # Groups by the network
   summarise(Median = median(Seconds)) # Returns the median value for each.
+
+rm(disc.dat1,disc.dat2,disc.dat3)
 ```
 
 ### Messages Data
@@ -102,6 +104,8 @@ And get the median.
 messmed.data = messdata %>%            # Creates new object as a copy
   group_by(Network) %>%                # Groups by the network
   summarise(Median = median(Messages)) # Returns the median value for each.
+
+rm(mess.dat1,mess.dat2)
 ```
 
 ### Query Period Data
@@ -113,36 +117,48 @@ que.dat1 <- read.delim("data/Query_Time/Discovery_time_Period_2000.txt", # filel
                         header = FALSE, # no header
                         col.names = "Seconds") # label the column
 
-que.dat1$Network = factor("B4") # Add a column called 'Network' with the network name
+que.dat1$Network = factor("2000") # Add a column called 'Network' with the network name
 que.dat1$Seconds = que.dat1$Seconds/1000 # Convert to milliseconds
 
 que.dat2 <- read.delim("data/Query_Time/Discovery_time_Period_1000.txt", # fileloc
                         header = FALSE, # no header
                         col.names = "Seconds") # label the column
 
-que.dat2$Network = factor("B4") # Add a column called 'Network' with the network name
+que.dat2$Network = factor("1000") # Add a column called 'Network' with the network name
 que.dat2$Seconds = que.dat2$Seconds/1000 # Convert to milliseconds
 
 que.dat3 <- read.delim("data/Query_Time/Discovery_time_Period_500.txt", # fileloc
                         header = FALSE, # no header
                         col.names = "Seconds") # label the column
 
-que.dat3$Network = factor("B4") # Add a column called 'Network' with the network name
+que.dat3$Network = factor("500") # Add a column called 'Network' with the network name
 que.dat3$Seconds = que.dat3$Seconds/1000 # Convert to milliseconds
 
 que.dat4 <- read.delim("data/Query_Time/Discovery_time_Period_200.txt", # fileloc
                         header = FALSE, # no header
                         col.names = "Seconds") # label the column
 
-que.dat4$Network = factor("B4") # Add a column called 'Network' with the network name
+que.dat4$Network = factor("200") # Add a column called 'Network' with the network name
 que.dat4$Seconds = que.dat4$Seconds/1000 # Convert to milliseconds
 ```
 
 Next, combine all the data files together into a single data frame, taking the mean of every file first.
 
 ```{r quecombinedata}
-quedata = rbind(mean(que.dat1$Seconds), # Binds the data together by row (hence 'r'bind).
-            mean(que.dat2$Seconds), mean(que.dat3$Seconds), mean(que.dat4$Seconds) ) # add each dataset here.
+# quedata = rbind(mean(que.dat1$Seconds), # Binds the data together by row (hence 'r'bind).
+#             mean(que.dat2$Seconds), mean(que.dat3$Seconds), mean(que.dat4$Seconds) ) # add each dataset here.
+
+quedata = rbind(que.dat1,que.dat2,que.dat3,que.dat4)
+
+quedata <- quedata %>%
+  group_by(Network) %>%
+  summarise(meanval = mean(Seconds),
+            minval  = min(Seconds),
+            maxval  = max(Seconds),
+            medval  = median(Seconds),
+            sdval   = sd(Seconds))
+
+rm(que.dat1,que.dat2,que.dat3,que.dat4)
 ```
 
 ### Ping data, lab 1
@@ -171,6 +187,7 @@ Next, combine all the data files together into a single data frame.
 ```{r pingcombinedata}
 pingdata = rbind(ping.dat1$Seconds, # Binds the data together by row (hence 'r'bind).
             ping.dat2$Seconds) # add each dataset here.
+rm(ping.dat1,ping.dat2)
 ```
 
 
@@ -282,6 +299,20 @@ Make a simple line plot for the query time plot
 ```{r queplot, echo = FALSE}
 x <- c(2000, 1000, 500, 200)
 plot(x, quedata, type = "o", xlab = "Query time (ms)", ylab = "Mean discovery time (s)", xlim=rev(range(x)))
+
+ ggplot(quedata, aes(x=Network,
+                     y=meanval, 
+                     group = 1)) +
+  geom_ribbon(aes(ymin=meanval-(1.96*sdval),
+                  ymax=meanval+(1.96*sdval)),
+              alpha=0.2) +
+  geom_line() +
+  geom_line(aes(y = medval),
+            lty = 2, 
+            col = "red") + 
+  geom_point(aes(y = minval)) + 
+  geom_point(aes(y = maxval)) + 
+  ylab("")
 ```
 
 And a double line plot for ping

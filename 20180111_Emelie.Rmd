@@ -25,27 +25,27 @@ Here you need to import the data for each network. Store the files separately in
 ### Discovery Time Data
 
 ```{r discdata}
-disc.dat1 <- read.delim("data/DiscoveryTime_Random.txt", # fileloc
+disc.dat1 <- read.delim("data/Discovery_time/Discovery_time_B4.txt", # fileloc
                         header = FALSE, # no header
                         col.names = "Seconds") # label the column
 
-disc.dat1$Network = factor("Random") # Add a column called 'Network' with the network name
+disc.dat1$Network = factor("B4") # Add a column called 'Network' with the network name
 
 disc.dat1$Seconds = disc.dat1$Seconds/1000 # convert to seconds
 
-disc.dat2 <- read.delim("data/DiscoveryTime_B4.txt", # fileloc
+disc.dat2 <- read.delim("data/Discovery_time/Discovery_time_Clos.txt", # fileloc
                         header = FALSE, # no header
                         col.names = "Seconds") # label the column
 
-disc.dat2$Network = factor("B4") # Add a column called 'Network' with the network name
+disc.dat2$Network = factor("Clos") # Add a column called 'Network' with the network name
 
 disc.dat2$Seconds = disc.dat2$Seconds/1000 # convert to seconds
 
-disc.dat3 <- read.delim("data/Discovery_time_Simple3.txt", # fileloc
+disc.dat3 <- read.delim("data/Discovery_time/Discovery_time_Telstra.txt", # fileloc
                         header = FALSE, # no header
                         col.names = "Seconds") # label the column
 
-disc.dat3$Network = factor("Dim3") # Add a column called 'Network' with the network name
+disc.dat3$Network = factor("Telstra Light") # Add a column called 'Network' with the network name
 
 disc.dat3$Seconds = disc.dat3$Seconds/1000 # convert to seconds
 
@@ -73,19 +73,26 @@ rm(disc.dat1,disc.dat2,disc.dat3)
 Here we will do the same for the messages data.
 
 ```{r messdata}
-mess.dat1 <- read.delim("data/MessagesSent_B4.txt", # fileloc
+mess.dat1 <- read.delim("data/Messages_sent/Messages_sent_B4.txt", # fileloc
                         header = FALSE, # no header
                         col.names = "Messages") # label the column
 
 mess.dat1$Network = factor("B4") # Add a column called 'Network' with the network name
 mess.dat1$Messages = mess.dat1$Messages/12 # divides B4 message numbers by 12.
 
-mess.dat2 <- read.delim("data/Messages_sent_Simple3.txt", # fileloc
+mess.dat2 <- read.delim("data/Messages_sent/Messages_sent_Clos.txt", # fileloc
                         header = FALSE, # no header
                         col.names = "Messages") # label the column
 
-mess.dat2$Network = factor("Dim3") # Add a column called 'Network' with the network name
-mess.dat2$Messages = mess.dat2$Messages/3 # divides B4 message numbers by 12.
+mess.dat2$Network = factor("Clos") # Add a column called 'Network' with the network name
+mess.dat2$Messages = mess.dat2$Messages/20 # divides Clos message numbers by 20.
+
+mess.dat3 <- read.delim("data/Messages_sent/Messages_sent_Telstra.txt", # fileloc
+                        header = FALSE, # no header
+                        col.names = "Messages") # label the column
+
+mess.dat3$Network = factor("Telstra Light") # Add a column called 'Network' with the network name
+mess.dat3$Messages = mess.dat3$Messages/23 # divides Telstra Light message numbers by 20.
 ```
 
 And we'll combine them in the same way.
@@ -95,7 +102,7 @@ And we'll combine them in the same way.
 #messdata = mess.dat1
 
 messdata = rbind(mess.dat1, # Binds the data together by row (hence 'r'bind).
-                 mess.dat2) # add each dataset here.
+                 mess.dat2, mess.dat3) # add each dataset here.
 ```
 
 And get the median.
@@ -105,7 +112,7 @@ messmed.data = messdata %>%            # Creates new object as a copy
   group_by(Network) %>%                # Groups by the network
   summarise(Median = median(Messages)) # Returns the median value for each.
 
-rm(mess.dat1,mess.dat2)
+rm(mess.dat1,mess.dat2,mess.dat3)
 ```
 
 ### Query Period Data
@@ -140,6 +147,13 @@ que.dat4 <- read.delim("data/Query_Time/Discovery_time_Period_200.txt", # filelo
 
 que.dat4$Network = factor("200") # Add a column called 'Network' with the network name
 que.dat4$Seconds = que.dat4$Seconds/1000 # Convert to milliseconds
+
+que.dat5 <- read.delim("data/Query_Time/Discovery_time_Period_150.txt", # fileloc
+                        header = FALSE, # no header
+                        col.names = "Seconds") # label the column
+
+que.dat5$Network = factor("150") # Add a column called 'Network' with the network name
+que.dat5$Seconds = que.dat5$Seconds/1000 # Convert to milliseconds
 ```
 
 Next, combine all the data files together into a single data frame, taking the mean of every file first.
@@ -148,7 +162,7 @@ Next, combine all the data files together into a single data frame, taking the m
 # quedata = rbind(mean(que.dat1$Seconds), # Binds the data together by row (hence 'r'bind).
 #             mean(que.dat2$Seconds), mean(que.dat3$Seconds), mean(que.dat4$Seconds) ) # add each dataset here.
 
-quedata = rbind(que.dat1,que.dat2,que.dat3,que.dat4)
+quedata = rbind(que.dat1,que.dat2,que.dat3,que.dat4,que.dat5)
 
 quedata <- quedata %>%
   group_by(Network) %>%
@@ -158,7 +172,7 @@ quedata <- quedata %>%
             medval  = median(Seconds),
             sdval   = sd(Seconds))
 
-rm(que.dat1,que.dat2,que.dat3,que.dat4)
+rm(que.dat1,que.dat2,que.dat3,que.dat4,que.dat5)
 ```
 
 ### Ping data, lab 1
@@ -187,7 +201,7 @@ Next, combine all the data files together into a single data frame.
 ```{r pingcombinedata}
 pingdata = rbind(ping.dat1$Seconds, # Binds the data together by row (hence 'r'bind).
             ping.dat2$Seconds) # add each dataset here.
-rm(ping.dat1,ping.dat2)
+#rm(ping.dat1,ping.dat2)
 ```
 
 
@@ -209,7 +223,7 @@ p1 <-  ggplot(data = discdata,         # our combined data
       # Call each plot
       geom_violin(position = "dodge",   # Ignore
                   fill = "grey") +      # colour of violin
-      geom_boxplot(width= 0.1,          # Width of the boxplot
+      geom_boxplot(width= 0.05,          # Width of the boxplot
                    outlier.colour = NA, # Outliers not plotted
                    position = "dodge",  # Ignore
                    fill = "black") +    # colour of box
@@ -219,13 +233,13 @@ p1 <-  ggplot(data = discdata,         # our combined data
                  aes(x = Network,  # Networks on the x axis (same as above).
                      y = Median),  # the Median value on the y axis.
                  colour = "white", # colour of the dot
-                 size = 4) +       # size of the dot
+                 size = 3) +       # size of the dot
       
       # formatting options
       
       theme_linedraw() + # a basic ggplot theme
       
-      labs(y = "Time (seconds)",              # y axis label
+      labs(y = "Discovery time (s)",              # y axis label
            x = "Network",                     # x axis label
            title = "Discovery Time Data") +  # Main title
       
@@ -263,17 +277,17 @@ p2 <-  ggplot(data = messdata,         # our combined data
       geom_violin(position = "dodge",   # Ignore
                   fill = "grey",
                   draw_quantiles = c(0.25, 0.5, 0.75)) +  # colour of violin
-      # geom_boxplot(width= 0.1,          # Width of the boxplot
-      #              outlier.colour = NA, # Outliers not plotted
-      #              position = "dodge",  # Ignore
-      #              fill = "black") +    # colour of box
+       geom_boxplot(width= 0.05,          # Width of the boxplot
+                    outlier.colour = NA, # Outliers not plotted
+                    position = "dodge",  # Ignore
+                    fill = "black") +    # colour of box
       
       # plot the Median points
-      # geom_point(data = messmed.data,  # the median data
-      #            aes(x = Network,  # Networks on the x axis (same as above).
-      #                y = Median),  # the Median value on the y axis.
-      #            colour = "white", # colour of the dot
-      #            size = 4) +       # size of the dot
+       geom_point(data = messmed.data,  # the median data
+                  aes(x = Network,  # Networks on the x axis (same as above).
+                      y = Median),  # the Median value on the y axis.
+                  colour = "white", # colour of the dot
+                  size = 3) +       # size of the dot
       
       # formatting options
       
@@ -297,10 +311,11 @@ p2
 Make a simple line plot for the query time plot
 
 ```{r queplot, echo = FALSE}
-x <- c(2000, 1000, 500, 200)
-plot(x, quedata, type = "o", xlab = "Query time (ms)", ylab = "Mean discovery time (s)", xlim=rev(range(x)))
+x <- c(2000, 1000, 500, 200, 150)
 
- ggplot(quedata, aes(x=Network,
+# plot(x, quedata, type = "o", xlab = "Query time (ms)", ylab = "Mean discovery time (s)", xlim=rev(range(x)))
+
+p4 <- ggplot(quedata, aes(x=Network,
                      y=meanval, 
                      group = 1)) +
   geom_ribbon(aes(ymin=meanval-(1.96*sdval),
@@ -312,12 +327,17 @@ plot(x, quedata, type = "o", xlab = "Query time (ms)", ylab = "Mean discovery ti
             col = "red") + 
   geom_point(aes(y = minval)) + 
   geom_point(aes(y = maxval)) + 
-  ylab("")
+  ylab("Discovery time (s)") +
+  xlab("Query period (ms)")
 ```
 
-And a double line plot for ping
+And a double line plot for ping , 
 
+```{r pingplot, echo=FALSE}
 x_ping  <- seq(1, length(ping.dat1$Seconds), 1)
 
-plot(x_ping, log(ping.dat1$Seconds), xlab="Sequence number of echo reply", ylab="Log(RTT)", type="l",col="red")
-lines(x_ping , log(ping.dat2$Seconds), col="green")
+plot(x_ping, log(ping.dat1$Seconds), xlab="Sequence number of ping", ylab="RTT (log(s))", type="l",col="red")
+lines(x_ping, log(ping.dat2$Seconds), type="l", lty=2, col="green")
+legend("topright", inset=.05,
+  	c("h1 ping h2","h2 ping h1"), fill=c("red","green"), horiz=TRUE)
+```

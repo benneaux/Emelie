@@ -281,7 +281,7 @@ Make a simple line plot for the query time plot
 
 ```{r queplot, echo = FALSE}
 x <- c(2000, 1000, 500, 200)
-plot(x, quedata, type = "o", xlim=rev(range(x)))
+plot(x, quedata, type = "o", xlab = "Query time (ms)", ylab = "Mean discovery time (s)", xlim=rev(range(x)))
 ```
 
 And a double line plot for ping
